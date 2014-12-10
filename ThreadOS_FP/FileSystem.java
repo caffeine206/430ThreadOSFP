@@ -113,21 +113,22 @@ public class FileSystem {
                 if (currentBlock == -1) { // need find a free block
                     short freeBlock = (short) superblock.getFreeBlock();
                     // attempt to submit block, then act based on return code
-                    switch (fte.inode.submitBlock(fte.seekPtr, freeBlock))
-                    // 0 = good to write, 1 = in use, 2 = indirect is empty
+                    int status = fte.inode.submitBlock(fte.seekPtr, freeBlock);
+                    switch ( status )
+                    // 1 = good to write, -1 = in use, 0 = indirect is empty
                     {
-                        case 1:
+                        case Inode.INDIRECT_IN_USE:
                             SysLib.cerr("Filesystem error on write\n");
                             return -1;
-                        case 2: // indirect is empty, search for new location
+                        case Inode.INDIRECT_EMPTY: // indirect is empty, search for new location
                             freeBlock = (short) superblock.getFreeBlock();
-                            int status = fte.inode.submitBlock(fte.seekPtr, freeBlock); // attempt to submit location
+                            status = fte.inode.submitBlock(fte.seekPtr, freeBlock); // attempt to submit location
                             if (!fte.inode.setIndexBlock((short) status)) { // attempt to set index to new location
                                 SysLib.cerr("Filesystem error on write\n");
                                 return -1;
                             }
                             // attempt submit block again
-                            if (fte.inode.submitBlock(fte.seekPtr, freeBlock) != 0) {
+                            if ( fte.inode.submitBlock(fte.seekPtr, freeBlock) != Inode.INDIRECT_AVAILABLE ) {
                                 SysLib.cerr("Filesystem error on write\n");
                                 return -1;
                             }

@@ -11,6 +11,9 @@
 public class Inode {
     public static final int iNodeSize = 32;
     public static final int directSize = 11;
+    public static final int INDIRECT_IN_USE = -1;  
+    public static final int INDIRECT_EMPTY = 0;
+    public static final int INDIRECT_AVAILABLE = 1;
     public int length;
     public short count;
     public short flag;
@@ -132,25 +135,25 @@ public class Inode {
         int location = pointer / Disk.blockSize;
         if (location < directSize) { // if found in direct
             if (direct[location] >= 0) // in use if not clean (0)
-                return 1;
+                return INDIRECT_IN_USE;
             if ((location > 0) && (direct[(location - 1)] == -1)) // good to write
-                return 0;
+                return INDIRECT_AVAILABLE;
             direct[location] = freeBlock; // update location
-            return 0;
+            return INDIRECT_AVAILABLE;
         }
         if (indirect < 0) { // indirect empty
-            return 2;
+            return INDIRECT_EMPTY;
         }
         // read indirect into data and write after adjusting for offset
         byte[] data = new byte[Disk.blockSize];
         SysLib.rawread(indirect, data);
         int offset = (location - directSize) * 2;
         if (SysLib.bytes2short(data, offset) > 0) { // in use
-            return 1;
+            return INDIRECT_IN_USE;
         }
         SysLib.short2bytes(freeBlock, data, offset);
         SysLib.rawwrite(indirect, data);
-        return 0;
+        return INDIRECT_AVAILABLE;
     }
 
     // release the indirect and return the data
