@@ -210,7 +210,7 @@ public class FileSystem {
     }
 
     // invalid offset error
-    public void invalidOffset() {
+    private void invalidOffset() {
         SysLib.cerr("invalid offset");
     }
 
