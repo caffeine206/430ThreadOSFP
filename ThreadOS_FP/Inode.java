@@ -10,15 +10,16 @@
  */
 public class Inode {
     public static final int iNodeSize = 32;
-    public static final int directSize = 11;
+    public static final int directSize = 11;        // number of direct pointers to blocks
+    // flags to represent the inode's current status
     public static final int INDIRECT_IN_USE = -1;  
     public static final int INDIRECT_EMPTY = 0;
     public static final int INDIRECT_AVAILABLE = 1;
-    public int length;
-    public short count;
-    public short flag;
-    public short[] direct = new short[directSize];
-    public short indirect;
+    public int length;                              // number of bytes in the file associated with this inode
+    public short count;                             // number of file table entries pointing to this inode
+    public short flag;                              // 0 = unused, 1 = used, etc
+    public short[] direct = new short[directSize];  // direct pointers to blocks
+    public short indirect;                          // an indirect pointer to a block
 
     // constructor with given number for inode
     public Inode(short iNumber) {
