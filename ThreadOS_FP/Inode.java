@@ -17,11 +17,12 @@ public class Inode {
     public short[] direct = new short[directSize];
     public short indirect;
 
+    // constructor with given number for inode
     public Inode(short iNumber) {
         int blockNumber = 1 + iNumber / 16;
         byte[] data = new byte[Disk.blockSize];
         SysLib.rawread(blockNumber, data);
-        int offset = (iNumber % 16) * 32;
+        int offset = (iNumber % 16) * iNodeSize;
 
         length = SysLib.bytes2int(data, offset);
         offset += 4;
@@ -37,19 +38,19 @@ public class Inode {
         indirect = SysLib.bytes2short(data, offset);
     }
 
+    // default constructor
     public Inode() {
         length = 0;
         count = 0;
         flag = 0;
         for (int i = 0; i < directSize; i++) {
-            direct[i] = -1;
+            direct[i] = -1; // intialize each index to -1 (unused)
         }
         indirect = -1;
     }
 
     //save to disk as the ith node
     public void toDisk(short iNumber) {
-
         // array for the data to get values
         byte[] data = new byte[iNodeSize];
         int offset = 0;
