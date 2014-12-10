@@ -154,7 +154,7 @@ public class Inode {
     }
 
     // release the indirect and return the data
-    byte[] releaseIndirect() {
+    public byte[] releaseIndirect() {
         // if indirect is valid,read the raw data, set to free and then return data
         if (indirect >= 0) {
             byte[] data = new byte[Disk.blockSize];
