@@ -176,6 +176,10 @@ public class FileSystem {
             return -1;
         }
 
+        // **Critical section
+        // if whence is set to 0 set seek pointer to offset
+        // else if whence is set to 1 set to current value plus offset
+        // else if whence is set to 2 set the pointer to the size of the file plus offset
         synchronized (fte) {
             switch (whence) {
                 case 0:
